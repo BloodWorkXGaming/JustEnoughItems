@@ -15,13 +15,15 @@
  */
 package mezz.jei.suffixtree;
 
-import javax.annotation.Nullable;
-
 import it.unimi.dsi.fastutil.chars.Char2ObjectMap;
 import it.unimi.dsi.fastutil.chars.Char2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.ints.IntSet;
+
+import javax.annotation.Nullable;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Represents a node of the generalized suffix tree graph
@@ -35,13 +37,14 @@ import it.unimi.dsi.fastutil.ints.IntSet;
  * - add nullable/nonnull annotations
  * - formatting
  */
-class Node {
+public class Node {
 
 	/**
 	 * The payload array used to store the data (indexes) associated with this node.
 	 * In this case, it is used to store all property indexes.
 	 */
-	private final IntList data;
+	private IntList data;
+	private Set<IntList> parent = new HashSet<>();
 
 	/**
 	 * The set of edges starting from this node
@@ -70,9 +73,12 @@ class Node {
 	 * of the path to this node is a substring of the one of the children nodes.
 	 */
 	void getData(final IntSet ret) {
-		ret.addAll(data);
+        ret.addAll(data);
+        for (IntList integers : parent) {
+            ret.addAll(integers);
+        }
 
-		for (Edge e : edges.values()) {
+        for (Edge e : edges.values()) {
 			e.getDest().getData(ret);
 		}
 	}
@@ -88,6 +94,7 @@ class Node {
 
 		addIndex(index);
 
+		/*
 		// add this reference to all the suffixes as well
 		Node iter = this.suffix;
 		while (iter != null) {
@@ -97,7 +104,7 @@ class Node {
 			} else {
 				break;
 			}
-		}
+		}*/
 
 		return true;
 	}
@@ -122,12 +129,14 @@ class Node {
 	}
 
 	@Nullable
-	Node getSuffix() {
+	public Node getSuffix() {
 		return suffix;
 	}
 
 	void setSuffix(Node suffix) {
 		this.suffix = suffix;
+		suffix.parent.add(data);
+		suffix.parent.addAll(parent);
 	}
 
 	private void addIndex(int index) {
@@ -136,6 +145,6 @@ class Node {
 
 	@Override
 	public String toString() {
-		return "Node: size:" + data.size() + " Edges: " + edges.toString();
+		return "Node: size:" + data.size() + " Edges: " + edges.toString() + " Parents: " + parent.size();
 	}
 }

@@ -266,8 +266,9 @@ public class GeneralizedSuffixTree implements ISearchTree {
 	 * appended to the concatenation of labels from s to n to get inpustr.
 	 */
 	private Pair<Node, String> canonize(final Node s, final String inputstr) {
+		System.out.println("str: " + inputstr);
 
-		if ("".equals(inputstr)) {
+		if (inputstr.isEmpty()) {
 			return new Pair<>(s, inputstr);
 		} else {
 			Node currentNode = s;
@@ -275,6 +276,7 @@ public class GeneralizedSuffixTree implements ISearchTree {
 			Edge g = s.getEdge(str.charAt(0));
 			// descend the tree as long as a proper label is found
 			while (g != null && str.startsWith(g.getLabel())) {
+				System.out.println("g = " + g);
 				str = str.substring(g.getLabel().length());
 				currentNode = g.getDest();
 				if (str.length() > 0) {
@@ -384,10 +386,14 @@ public class GeneralizedSuffixTree implements ISearchTree {
 		return highestIndex;
 	}
 
-	/**
+    public Node getRoot() {
+        return root;
+    }
+
+    /**
 	 * A private class used to return a tuples of two elements
 	 */
-	private class Pair<A, B> {
+	private static class Pair<A, B> {
 
 		private final A first;
 		private final B second;
